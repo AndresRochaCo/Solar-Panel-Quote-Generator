@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+
+<body>
+  <div class="container">
+    <div class="left-controls">
+      <h1>Bienvenido</h1>
+
+      <h3>Generar Cotización</h3>
+      <button id="generateQuoteBtn">Generar Cotización</button>
+
+      <div class="quote-container">
+        <label for="referenceNumber">Número de Referencia</label>
+        <input type="text" id="referenceNumber" placeholder="585 041 101 554" />
+
+
+
+        <label for="consumptionInput">Consumo (kWh)</label>
+        <input type="number" id="consumptionInput" placeholder="e.g. 22.4" step="0.1" />
+
+        <button id="addEntryBtn">+ Agregar</button>
+
+
+        <div class="quote-container-output">
+
+          <div class="panels-container">
+
+
+            <form action="/submit-solar-panel" method="POST">
+              <label for="solarPanel">Select a solar panel:</label>
+
+              <select id="solarPanel" name="solarPanel" required>
+                <option value="">-- Selecciona el Modulo --</option>
+              </select>
+
+              <br /><br />
+
+              <button type="submit">Submit</button>
+            </form>
+
+
+
+
+
+
+
+
+
+
+          </div>
+
+          <pre id="ticket"></pre>
+
+
+
+          <div class="financial-table-container">
+            <h2>Simulador Solar</h2>
+
+
+
+            <table border="1">
+              <caption><strong>DATOS FINANCIEROS</strong></caption>
+              <tbody>
+
+                <tr>
+                  <td>Costo Wp</td>
+                  <td><input type="number" id="systemCost" value="3897.60" step="0.01"></td>
+                  <td>$</td>
+                </tr>
+
+
+                <tr>
+                  <td>Costo del sistema</td>
+                  <td><input type="number" id="systemCost" value="3897.60" step="0.01"></td>
+                  <td>$</td>
+                </tr>
+
+
+                <tr>
+                  <td>Tir</td>
+                  <td><input type="number" id="initialRate" value="0.195" step="0.001"></td>
+                  <td>$/kWh</td>
+                </tr>
+
+                <tr>
+                  <td>Retorno</td>
+                  <td><input type="number" id="initialRate" value="0.195" step="0.001"></td>
+                  <td>$/kWh</td>
+                </tr>
+
+                <tr>
+                  <td>Tarifa inicial CFE</td>
+                  <td><input type="number" id="initialRate" value="0.195" step="0.001"></td>
+                  <td>$/kWh</td>
+                </tr>
+
+                <tr>
+                  <td>Incremento anual tarifa</td>
+                  <td><input type="number" id="rateIncrease" value="25"></td>
+                  <td>%</td>
+                </tr>
+
+
+                <tr>
+                  <td>Consumo</td>
+                  <td><input type="number" id="initialRate" value="0.195" step="0.001"></td>
+                  <td>$/kWh</td>
+                </tr>
+              </tbody>
+            </table>
+
+
+
+
+
+
+            <table border="1" id="technicalTable">
+              <caption><strong>DATOS TÉCNICOS</strong></caption>
+              <tbody>
+                <tr>
+                  <td># de paneles</td>
+                  <td><input type="number" id="numPanels" value="0" step="1"></td>
+                  <td>pzas</td>
+                </tr>
+
+                <tr>
+                  <td>Watts por panel</td>
+                  <td>
+                    <input type="number" data-group="technical" data-key="wattsPanel" value="320">
+                  </td>
+                  <td>W</td>
+                </tr>
+
+                <tr>
+                  <td>Tamaño del sistema</td>
+                  <td>
+                    <input type="number" data-group="technical" data-key="systemSize" value="2240">
+                  </td>
+                  <td>W</td>
+                </tr>
+
+                <tr>
+                  <td>Horas de sol anuales</td>
+                  <td>
+                    <input type="number" data-group="technical" data-key="sunHours" value="1850">
+                  </td>
+                  <td>h</td>
+                </tr>
+
+                <tr>
+                  <td>Degradación anual</td>
+                  <td>
+                    <input type="number" data-group="technical" data-key="degradation" value="0.5" step="0.1">
+                  </td>
+                  <td>%</td>
+                </tr>
+
+                <tr>
+                  <td>Producción anual</td>
+                  <td>
+                    <input type="number" data-group="technical" data-key="production" value="4592" readonly>
+                  </td>
+                  <td>kWh</td>
+                </tr>
+
+                <tr>
+                  <td>Cubre el</td>
+                  <td>
+                    <input type="number" data-group="technical" data-key="coverage" value="109" readonly>
+                  </td>
+                  <td>%</td>
+                </tr>
+              </tbody>
+            </table>
+
+
+
+
+
+
+
+
+
+
+          </div>
+
+
+
+
+          <script src="app.js"></script>
+
+        </div>
+
+
+
+
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+
+
+</html>
