@@ -1,34 +1,60 @@
-const addEntryBtn = document.getElementById("addEntryBtn");
-const input = document.getElementById("consumptionInput");
-const ticket = document.getElementById("ticket");
-
-let entries = [];
 
 
-let totalConsumption = 0;
+// ===============================
+// CONSUMPTION LOGIC
+// ===============================
 
-function renderTicket() {
-  const total = entries.reduce((a, b) => a + b, 0);
+const monthInput = document.getElementById("month");
+const kwhInput = document.getElementById("kwh");
+const addBtn = document.getElementById("addConsumption");
+const listContainer = document.getElementById("consumptionList");
+const totalDisplay = document.getElementById("totalKwh");
 
-  let output = "";
-  output += "+---------------------------+\n";
-  output += "|        CONSUMO(kWh)        |\n";
-  output += "+---------------------------+\n";
+let consumptions = [];
 
-  entries.forEach(v => {
-    output += `|          ${v.toFixed(2).padStart(6)}            |\n`;
-  });
+addBtn.addEventListener("click", () => {
+  const month = monthInput.value.trim();
+  const kwh = parseFloat(kwhInput.value);
 
-  output += "+---------------------------+\n";
-  output += `| TOTAL:${total.toFixed(2).padStart(10)} kwh/año   |\n`;
-  output += "+---------------------------+\n";
+  if (!month || isNaN(kwh)) return;
 
-  ticket.textContent = output;
-  totalConsumption = total;
-  return total;
+  const newEntry = {
+    id: Date.now(),
+    month,
+    kwh
+  };
+
+  consumptions.push(newEntry);
+
+  renderConsumptions();
+  updateSystemSize();
+  updateTecDataTable();
+
+  monthInput.value = "";
+  kwhInput.value = "";
+});
+
+function getTotalConsumption() {
+  return consumptions.reduce((sum, c) => sum + c.kwh, 0);
 }
 
+function renderConsumptions() {
+  listContainer.innerHTML = "";
+  const total = getTotalConsumption();
 
+  for (const consumption of consumptions) {
+    const div = document.createElement("div");
+    div.className = "ticket";
+    div.textContent = `${consumption.month} - ${consumption.kwh} kWh`;
+    listContainer.appendChild(div);
+  }
+
+  totalDisplay.textContent = total.toFixed(2);
+}
+
+// ===============================
+// PANEL SELECT LOGIC
+// ===============================
 
 const solarPanels = [
   { id: "jam710", name: "Panel JA 710W", watts: 710 },
@@ -36,68 +62,91 @@ const solarPanels = [
   { id: "jam625", name: "Panel JA 625W", watts: 625 }
 ];
 
-const solarSelect = document.getElementById("solarPanel");
+const panelSelect = document.getElementById("solarPanelSelect");
+const panelsDisplay = document.getElementById("panelsNeeded");
 
-// Populate select
 solarPanels.forEach(panel => {
   const option = document.createElement("option");
   option.value = panel.id;
   option.textContent = panel.name;
-  solarSelect.appendChild(option);
+  option.dataset.watts = panel.watts;
+  panelSelect.appendChild(option);
 });
 
 
+// ===============================
+// CALCULATION LOGIC
+// ===============================
 
-solarSelect.addEventListener("change", () => {
-  const selectedId = solarSelect.value;
-  if (!selectedId) return;
+function calculatePanelsNeeded() {
+  const totalConsumption = getTotalConsumption();
 
-  const selectedPanel = solarPanels.find(panel => panel.id === selectedId);
+  const selectedOption = panelSelect.options[panelSelect.selectedIndex];
+  const panelWatts = parseFloat(selectedOption.dataset.watts);
 
-  if (totalConsumption > 0) {
-    const panelsNeeded = numberOfSolarPanels(totalConsumption, selectedPanel.watts);
-    console.log("Panels needed:", panelsNeeded);
+  if (!panelWatts || totalConsumption === 0) return 0;
 
-     document.getElementById("panelsNeededDisplay").textContent = `Se necesitan ${panelsNeeded} paneles`;
+  const panels = ((totalConsumption / 1850) * 1000) / panelWatts;
 
-  }
-});
+  return Math.ceil(panels);
+}
 
-
-
-addEntryBtn.addEventListener("click", () => {
-  const value = parseFloat(input.value);
-  if (isNaN(value) || value <= 0) return;
-
-  entries.push(value);
-  input.value = "";
-
-  renderTicket();
-
-  // Recalculate panels if a panel is already selected
-  const selectedId = solarSelect.value;
-  if (selectedId) {
-    const selectedPanel = solarPanels.find(panel => panel.id === selectedId);
-    const panelsNeeded = numberOfSolarPanels(totalConsumption, selectedPanel.watts);
-    document.getElementById("panelsNeededDisplay").textContent = `Se necesitan ${panelsNeeded} paneles`;
-  }
-});
+function updateSystemSize() {
+  const panels = calculatePanelsNeeded();
+  panelsDisplay.textContent = panels;
 
 
-
-
-
-function numberOfSolarPanels(totalConsumption, wattsPerPanel, annualSunHours = 1850) {
-    // Calculate kWh produced by 1 panel per year
-    const panelProduction = (wattsPerPanel * annualSunHours) / 1000; // kWh/year per panel
-    return Math.ceil(totalConsumption / panelProduction);
-
-   
 }
 
 
 
-console.log(numberOfSolarPanels);
+
+// ===============================
+// POPULATING TABLE
+// ===============================
+
+
+    
+
+    panelSelect.addEventListener("change", () => {
+    updateSystemSize();
+    updateTecDataTable();
+});
+
+
+function updateTecDataTable(){
+    
+    const systemSizeTableData = document.getElementById("systemSizeTable");
+    const panels = calculatePanelsNeeded();
+    
+    const selectedOption = panelSelect.options[panelSelect.selectedIndex];
+  const panelWatts = parseFloat(selectedOption.dataset.watts);
+
+    const systemSize = panels * panelWatts;
+    systemSizeTableData.textContent = systemSize;
+
+    
+    const wattsPanelTable = document.getElementById("wattsPanelTable");
+    wattsPanelTable.textContent = panelWatts;
+
+    const penelsNumberTable = document.getElementById("panelsNumberTable");
+    penelsNumberTable.textContent = panels;
+
+
+    const productionTable = document.getElementById("productionTable");
+
+    production = (systemSize * 1850)/1000;
+
+
+    productionTable.textContent = production;
+
+
+    const coverageTable = document.getElementById("coverageTable");
+
+    coverageTable.textContent = (((production * 100)/ 0.5)/100);
+
+    console.log("updateTecDataTable running");
+}
 
 
 
@@ -106,24 +155,3 @@ console.log(numberOfSolarPanels);
 
 
 
-
- const financialData = [
-    { label: "Costo Wp", id: "costWp", value: 3897.60, step: 0.01, unit: "$" },
-    { label: "Costo del sistema", id: "systemCost", value: 3897.60, step: 0.01, unit: "$" },
-    { label: "TIR", id: "tir", value: 0.195, step: 0.001, unit: "$/kWh" },
-    { label: "Retorno", id: "retorno", value: 0.195, step: 0.001, unit: "$/kWh" },
-    { label: "Tarifa inicial CFE", id: "initialRate", value: 0.195, step: 0.001, unit: "$/kWh" },
-    { label: "Incremento anual tarifa", id: "rateIncrease", value: 25, step: 1, unit: "%" },
-    { label: "Consumo", id: "consumo", value: 0.195, step: 0.001, unit: "$/kWh" }
-  ];
-
-
-  const solarData = [
-    { label: "# de paneles", id: "numPanels", value: 7, step: 1, unit: "pzas" },
-    { label: "Watts por panel", id: "wattsPanel", value: 320, step: 1, unit: "W" },
-    { label: "Tamaño del sistema", id: "systemSize", value: 2240, step: 1, unit: "W" },
-    { label: "Horas de sol anuales", id: "annualSunHours", value: 1850, step: 1, unit: "h" },
-    { label: "Degradación anual", id: "annualDegradation", value: 0.5, step: 0.1, unit: "%" },
-    { label: "Producción anual", id: "annualProduction", value: 4592, step: 1, unit: "kWh" },
-    { label: "Cubre el", id: "coverage", value: 109, step: 1, unit: "%" },
-  ];
