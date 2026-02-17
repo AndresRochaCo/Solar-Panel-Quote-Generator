@@ -1,4 +1,48 @@
 
+// ===============================
+// GLOBAL VARIABLES 
+// ===============================
+
+
+
+let degradationRate = 0;
+let initialTarifa = 0;
+let inflationRate = 0;
+let costoWp = 0;
+
+// ===============================
+// INPUT VARIABLES
+// ===============================
+
+
+
+function updateFinancialInputs() {
+  costoWp = parseFloat(
+    document.getElementById("costWP").value
+  ) || 0;
+
+
+
+
+  initialTarifa = parseFloat(
+    document.getElementById("tarifaInput").value
+  ) || 0;
+
+
+  
+  inflationRate = parseFloat(
+    document.getElementById("incrementoInput").value
+  ) / 100 || 0;
+
+ 
+}
+
+
+
+
+
+
+
 
 // ===============================
 // CONSUMPTION LOGIC
@@ -28,7 +72,21 @@ addBtn.addEventListener("click", () => {
 
   renderConsumptions();
   updateSystemSize();
-  updateTecDataTable();
+ updateFinancialInputs();
+
+
+  const { production } = updateTecDataTable();
+
+
+
+generateProjection(
+  production,
+  
+);
+
+
+
+  
 
   monthInput.value = "";
   kwhInput.value = "";
@@ -115,7 +173,11 @@ function updateSystemSize() {
 
 
 function updateTecDataTable(){
+
+
+
     
+
     const systemSizeTableData = document.getElementById("systemSizeTable");
     const panels = calculatePanelsNeeded();
     
@@ -135,7 +197,7 @@ function updateTecDataTable(){
 
     const productionTable = document.getElementById("productionTable");
 
-    production = (systemSize * 1850)/1000;
+    const production = (systemSize * 1850)/1000;
 
 
     productionTable.textContent = production;
@@ -143,9 +205,77 @@ function updateTecDataTable(){
 
     const coverageTable = document.getElementById("coverageTable");
 
-    coverageTable.textContent = (((production * 100)/ 0.5)/100);
+    
+
+    coverageTable.textContent =
+  ((production / getTotalConsumption()) * 100).toFixed(2);
+
 
     console.log("updateTecDataTable running");
+
+
+    return{
+      production: production,
+      systemSize: systemSize
+    };
+}
+
+
+function updateFinancialDataTable(systemSize){
+  const costoSistema = systemSize * costoWp;
+
+  document.getElementById("costoSistemaTable").textContent =
+    costoSistema.toFixed(2);
+}
+
+
+
+// ===============================
+// POPULATING TABLE
+// ===============================
+
+
+
+function generateProjection(production, degradationRate, initialTarifa, inflationRate) {
+
+  
+
+
+
+
+    const tableBody = document.getElementById("projectionTable");
+    tableBody.innerHTML = "";
+
+    let energy = production;          // start with original
+    let retornoAcumulado = 0;
+    let tarifa = initialTarifa;
+
+    let rows = "";
+
+    for (let year = 1; year <= 25; year++) {
+
+        if (year > 1) {
+            energy *= (1 - degradationRate);   // degrade production
+            tarifa *= (1 + inflationRate);     // increase tarifa
+        }
+
+        const ahorro = energy * tarifa;
+        retornoAcumulado += ahorro;
+
+        rows += `
+            <tr>
+                <td>${year}</td>
+                <td>${energy.toFixed(0)}</td>
+                <td>${tarifa.toFixed(4)}</td>
+                <td>$${ahorro.toFixed(2)}</td>
+                <td>$${retornoAcumulado.toFixed(2)}</td>
+            </tr>
+        `;
+    }
+
+    tableBody.innerHTML = rows;
+    console.log(tableBody);
+
 }
 
 

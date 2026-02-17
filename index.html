@@ -10,9 +10,9 @@
 
     <form action="">
         
-        <input type="text" id="month" placeholder="Month">
+        <input type="text" id="month" placeholder="Mes">
 <input type="number" id="kwh" placeholder="kWh">
-<button id="addConsumption" type="button">Add</button>
+<button id="addConsumption" type="button">Agregar</button>
 <div id="consumptionList"></div>
 <p><strong>Total kWh:</strong> <span id="totalKwh">0</span> kWh</p>
 
@@ -22,7 +22,7 @@
 
 
 
-<label for="solarPanelSelect">Select Solar Panel:</label>
+<label for="solarPanelSelect">Seleciona el Panel Solar:</label>
 <select id="solarPanelSelect">
   <!-- Options will be populated by JS -->
 </select>
@@ -44,7 +44,7 @@
 
       <tr>
         <td>Costo Wp</td>
-        <td><input type="text"></td>
+        <td><input type="text" id="costWP"></td>
         <td>Unit</td>
       </tr>
 
@@ -68,13 +68,13 @@
 
       <tr>
         <td>Tarifa</td>
-        <td><input type="number"></td>
+        <td><input type="number" id="tarifaInput"></td>
         <td>Unit</td>
       </tr>
 
       <tr>
         <td>Incremento</td>
-        <td><input type="number"></td>
+        <td><input type="number" id="incrementoInput"></td>
         <td>Unit</td>
       </tr>
 
@@ -122,7 +122,7 @@
 
       <tr>
         <td>Degradacion</td>
-        <td>0.5%</td>
+        <td><input type="number" id="degradationInput" step="0.01" value="0.5"></td>
         <td>Unit</td>
       </tr>
 
@@ -149,6 +149,28 @@
 
 
 <p><strong>Panels Needed:</strong> <span id="panelsNeeded">0</span></p>
+
+
+
+
+  <div class="financial-data">
+    <table border="0">
+    <thead>
+        <tr>
+            <th>AÑO</th>
+            <th>ENERGÍA PRODUCIDA</th>
+            <th>TARIFA CFE</th>
+            <th>AHORRO</th>
+            <th>RETORNO</th>
+        </tr>
+    </thead>
+    <tbody id="projectionTable"></tbody>
+</table>
+
+<button onclick="generateProjection()">Generate</button>
+
+  </div>
+
 
 
 
